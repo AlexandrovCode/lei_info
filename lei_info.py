@@ -397,6 +397,7 @@ class Handler(Extract, GetPages):
         return text
 
     def get_overview(self, link_name):
+        print(link_name)
 
         self.overview = {}
         self.overview['isDomiciledIn'] = 'NO'
@@ -460,6 +461,19 @@ class Handler(Extract, GetPages):
                 '@type': 'Organization',
                 'name': agent[0]
             }
+        self.get_working_tree_api(link_name, 'tree')
+        if self.overview.get('mdaas:RegisteredAddressss') is None:
+            addr = self.get_by_xpath('//div/text()[contains(., "Legal address")]/../following-sibling::div[1]/a/text()')[0]
+            #addr = addrf[0].split(', ')
+            temp = {
+                'zip': addr.split(', ')[-2],
+                'streetAddress': ', '.join(addr.split(', ')[:2]),
+                'city': addr.split(', ')[-3],
+                'country': addr.split(', ')[-1],
+                'fullAddress': addr,
+            }
+            self.overview['mdaas:RegisteredAddress'] = temp
+
 
         # self.fillField('logo', xpath='//div[@class="charity-logo"]/a/img/@src')
         # 'url'
