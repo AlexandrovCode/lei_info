@@ -401,7 +401,7 @@ class Handler(Extract, GetPages):
         #print(link_name)
 
         self.overview = {}
-        self.overview['isDomiciledIn'] = 'NO'
+
         self.overview['@source-id'] = self.NICK_NAME
         self.overview['bst:sourceLinks'] = [link_name]
         self.overview['bst:registryURI'] = link_name
@@ -423,6 +423,11 @@ class Handler(Extract, GetPages):
 
         self.fillField('bst:description',
                        xpath='//div[@class="seo-block margin-top-40"]/div/div//text()')
+
+        try:
+            self.overview['isDomiciledIn'] = self.overview['bst:description'].split(' ')[-2]
+        except:
+            pass
 
         self.fill_identifiers(
             xpathLegalEntityIdentifier='//span/text()[contains(., "LEI code")]/../following-sibling::span[1]/text()',
@@ -465,7 +470,9 @@ class Handler(Extract, GetPages):
         except:
             pass
         self.get_working_tree_api(link_name, 'tree')
-        if self.overview.get('mdaas:RegisteredAddressss') is None:
+        # print(self.overview['mdaas:RegisteredAddress'])
+
+        if self.overview.get('mdaas:RegisteredAddress') is None:
             addr = self.get_by_xpath('//div/text()[contains(., "Legal address")]/../following-sibling::div[1]/a/text()')[0]
             #addr = addrf[0].split(', ')
             temp = {

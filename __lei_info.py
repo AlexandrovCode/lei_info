@@ -8,7 +8,7 @@ if __name__ == '__main__':
     a = Handler()
 
     #final_data = a.Execute('bank 1 oslo', '', '', '')
-    final_data = a.Execute('City of Denton texas', '', '', '')
+    final_data = a.Execute('LOKESH INDUSTRIAL SERVICES PRIVATE LIMITED', '', '', '')
     print(json.dumps(final_data, indent=4))
 
     elapsed_time = time.time() - start_time
