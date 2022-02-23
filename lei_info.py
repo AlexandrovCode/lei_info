@@ -249,6 +249,7 @@ class Handler(Extract, GetPages):
 
         if xpathTradeRegistry:
             trade = self.get_by_xpath(xpathTradeRegistry)
+            #print(trade)
             if trade:
                 temp['trade_register_number'] = trade[0]
         if xpathOtherCompanyId:
@@ -397,7 +398,7 @@ class Handler(Extract, GetPages):
         return text
 
     def get_overview(self, link_name):
-        print(link_name)
+        #print(link_name)
 
         self.overview = {}
         self.overview['isDomiciledIn'] = 'NO'
@@ -439,28 +440,30 @@ class Handler(Extract, GetPages):
 
         url = 'https://lei.info/externalData/openCorporates'
 
-        data = {
-            'companyIdentifier': self.overview['identifiers']['trade_register_number'],
-            'jurisdictionCode': ''
-        }
-
-        self.get_working_tree_api(url, type='api', data=data, method='POST')
-
-        self.tree = etree.HTML(self.api['data'])
-
-        self.getSpecialAddress()
-
-        self.fillField('dissolutionDate',
-                       xpath='//div/text()[contains(., "Dissolution date")]/../following-sibling::div[1]/text()')
-        self.fillField('isIncorporatedIn',
-                       xpath='//div/text()[contains(., "Incorporation date")]/../following-sibling::div[1]/text()')
-
-        agent = self.get_by_xpath('//div/text()[contains(., "Agent name")]/../following-sibling::div[1]/text()')
-        if agent:
-            self.overview['agent'] = {
-                '@type': 'Organization',
-                'name': agent[0]
+        try:
+            data = {
+                'companyIdentifier': self.overview['identifiers']['trade_register_number'],
+                'jurisdictionCode': ''
             }
+
+            self.get_working_tree_api(url, type='api', data=data, method='POST')
+
+            self.tree = etree.HTML(self.api['data'])
+
+            self.getSpecialAddress()
+
+            self.fillField('dissolutionDate',
+                           xpath='//div/text()[contains(., "Dissolution date")]/../following-sibling::div[1]/text()')
+            self.fillField('isIncorporatedIn',
+                           xpath='//div/text()[contains(., "Incorporation date")]/../following-sibling::div[1]/text()')
+
+            agent = self.get_by_xpath('//div/text()[contains(., "Agent name")]/../following-sibling::div[1]/text()')
+            if agent:
+                self.overview['agent'] = {
+                    '@type': 'Organization',
+                    'name': agent[0]}
+        except:
+            pass
         self.get_working_tree_api(link_name, 'tree')
         if self.overview.get('mdaas:RegisteredAddressss') is None:
             addr = self.get_by_xpath('//div/text()[contains(., "Legal address")]/../following-sibling::div[1]/a/text()')[0]
